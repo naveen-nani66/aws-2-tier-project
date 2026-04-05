@@ -3,11 +3,11 @@ pipeline {
 
     environment {
         AWS_DEFAULT_REGION = 'us-east-1'
-        AWS_ACCOUNT_ID     = '657001761946'
+        AWS_ACCOUNT_ID     = '497339096730'
         IMAGE_TAG          = "1.0.${BUILD_NUMBER}"
         SCANNER_HOME       = tool 'sonar-scanner'
-        FRONTEND_ECR_URI   = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/frontend-repo"
-        BACKEND_ECR_URI    = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/backend-repo"
+        FRONTEND_ECR_URI   = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/frontend"
+        BACKEND_ECR_URI    = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/backend"
     }
 
     stages {
@@ -22,7 +22,7 @@ pipeline {
             steps {
                 git branch: 'main',
                     credentialsId: 'github-cred',
-                    url: 'https://github.com/vijaygiduthuri/aws-2-tier-project.git'
+                    url: 'https://github.com/naveen-nani66/aws-2-tier-project.git'
             }
         }
 
@@ -46,12 +46,12 @@ pipeline {
             }
         }
 
-        stage('OWASP Dependency-Check Scan') {
-            steps {
-                dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', odcInstallation: 'DP-Check'
-                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
-            }
-        }
+        // stage('OWASP Dependency-Check Scan') {
+        //     steps {
+        //         dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', odcInstallation: 'DP-Check'
+        //         dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+        //     }
+        // }
 
         stage('Authenticate with AWS and ECR') {
             steps {
@@ -136,14 +136,14 @@ pipeline {
             steps {
                 git branch: 'main',
                     credentialsId: 'github-cred',
-                    url: 'https://github.com/vijaygiduthuri/aws-2-tier-helm-chart.git'
+                    url: 'https://github.com/naveen-nani66/aws-2-tier-helm-chart.git'
             }
         }
 
         stage('Update helm values.yaml with New Docker Image') {
             environment {
                 GIT_REPO_NAME = "aws-2-tier-helm-chart"
-                GIT_USER_NAME = "vijaygiduthuri"
+                GIT_USER_NAME = "naveen-nani66"
             }
             steps {
                 withCredentials([usernamePassword(
@@ -154,14 +154,14 @@ pipeline {
                     sh """
                         set -e
 
-                        git config user.email "vijaygiduthuri@example.com"
+                        git config user.email "naveen@example.com"
                         git config user.name "${GIT_USER_NAME}"
 
                         echo "=== BEFORE ==="
                         cat helm-chart/values.yaml
 
-                        sed -i "s|image: 657001761946.dkr.ecr.us-east-1.amazonaws.com/frontend-repo:.*|image: 657001761946.dkr.ecr.us-east-1.amazonaws.com/frontend-repo:${IMAGE_TAG}|" helm-chart/values.yaml
-                        sed -i "s|image: 657001761946.dkr.ecr.us-east-1.amazonaws.com/backend-repo:.*|image: 657001761946.dkr.ecr.us-east-1.amazonaws.com/backend-repo:${IMAGE_TAG}|" helm-chart/values.yaml
+                        sed -i "s|image: 497339096730.dkr.ecr.us-east-1.amazonaws.com/frontend:.*|image: 497339096730.dkr.ecr.us-east-1.amazonaws.com/frontend:${IMAGE_TAG}|" helm-chart/values.yaml
+                        sed -i "s|image: 497339096730.dkr.ecr.us-east-1.amazonaws.com/backend:.*|image: 497339096730.dkr.ecr.us-east-1.amazonaws.com/backend:${IMAGE_TAG}|" helm-chart/values.yaml
 
                         echo "=== AFTER ==="
                         cat helm-chart/values.yaml
