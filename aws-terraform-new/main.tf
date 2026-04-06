@@ -45,7 +45,7 @@ module "security_group" {
 module "ec2" {
   source             = "./ec2"
   ami_id             = "ami-04b4f1a9cf54c11d0" # Ubuntu 22.04 (us-east-1)
-  instance_type      = "t2.micro"
+  instance_type      = "t3.small"
   subnet_id          = element(module.vpc.public_subnet_ids, 0)
   security_group_ids = [module.security_group.sg_ec2_sg_ssh_http_id]
   key_name           = "Project-key"  # create keypair manually & update name here
