@@ -14,7 +14,7 @@ terraform {
 
 terraform {
   backend "s3" {
-    bucket  = "bucket-terraformstatefiles " # create s3 bucket to store statefile
+    bucket  = "bucket-terraformstatefiles" # create s3 bucket to store statefile
     key     = "dev/terraform.tfstate"
     region  = "us-east-1"
     encrypt = false
