@@ -140,7 +140,7 @@ pipeline {
             }
         }
 
-        stage('Update helm values.yaml with New Docker Image') {
+       stage('Update helm values.yaml with New Docker Image') {
             environment {
                 GIT_REPO_NAME = "aws-2-tier-helm-chart"
                 GIT_USER_NAME = "naveen-nani66"
@@ -153,23 +153,22 @@ pipeline {
                 )]) {
                     sh """
                         set -e
-                        # 1. Update the image tag using double quotes to handle variables properly
-                        # We use [[:space:]]* to match any indentation at the start
+                        # 1. Update the image tag
                         sed -i "s|[[:space:]]*image: 497339096730.dkr.ecr.us-east-1.amazonaws.com/frontend:.*|  image: 497339096730.dkr.ecr.us-east-1.amazonaws.com/frontend:${IMAGE_TAG}|" helm-chart/values.yaml
                         sed -i "s|[[:space:]]*image: 497339096730.dkr.ecr.us-east-1.amazonaws.com/backend:.*|  image: 497339096730.dkr.ecr.us-east-1.amazonaws.com/backend:${IMAGE_TAG}|" helm-chart/values.yaml
                     
-                        # 2. VERIFY the change actually happened in the console
+                        # 2. VERIFY
                         echo "Verification: Checking if values.yaml updated to version ${IMAGE_TAG}"
                         grep "image:" helm-chart/values.yaml
                     
-                        # 3. PUSH the change back to GitHub
+                        # 3. PUSH the change back to GitHub using the injected credentials
                         git config user.email "jenkins@example.com"
                         git config user.name "Jenkins Pipeline"
                         git add helm-chart/values.yaml
                         git commit -m "chore: update image tag to ${IMAGE_TAG} [skip ci]"
                         
-                        # Use credentials to push (assuming you have a 'github-token' credential id)
-                        git push origin main
+                        # The Secret Sauce:
+                        git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME}.git main
                     """
                 }
             }
