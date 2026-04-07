@@ -154,8 +154,9 @@ pipeline {
                     sh """
                         set -e
                         # 1. Update the image tag using double quotes to handle variables properly
-                        sed -i "s|image: 497339096730.dkr.ecr.us-east-1.amazonaws.com/frontend:.*|image: 497339096730.dkr.ecr.us-east-1.amazonaws.com/frontend:${IMAGE_TAG}|" helm-chart/values.yaml
-                        sed -i "s|image: 497339096730.dkr.ecr.us-east-1.amazonaws.com/backend:.*|image: 497339096730.dkr.ecr.us-east-1.amazonaws.com/backend:${IMAGE_TAG}|" helm-chart/values.yaml
+                        # We use [[:space:]]* to match any indentation at the start
+                        sed -i "s|[[:space:]]*image: 497339096730.dkr.ecr.us-east-1.amazonaws.com/frontend:.*|  image: 497339096730.dkr.ecr.us-east-1.amazonaws.com/frontend:${IMAGE_TAG}|" helm-chart/values.yaml
+                        sed -i "s|[[:space:]]*image: 497339096730.dkr.ecr.us-east-1.amazonaws.com/backend:.*|  image: 497339096730.dkr.ecr.us-east-1.amazonaws.com/backend:${IMAGE_TAG}|" helm-chart/values.yaml
                     
                         # 2. VERIFY the change actually happened in the console
                         echo "Verification: Checking if values.yaml updated to version ${IMAGE_TAG}"
