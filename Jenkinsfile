@@ -153,26 +153,13 @@ pipeline {
                 )]) {
                     sh """
                         set -e
-
-                        git config user.email "naveen@example.com"
-                        git config user.name "${GIT_USER_NAME}"
-
-                        echo "=== BEFORE ==="
-                        cat helm-chart/values.yaml
-
+                        # ... git config lines ...
+                    
+                        # Use the specific account ID (497339096730) and replace the whole image line
                         sed -i "s|image: 497339096730.dkr.ecr.us-east-1.amazonaws.com/frontend:.*|image: 497339096730.dkr.ecr.us-east-1.amazonaws.com/frontend:${IMAGE_TAG}|" helm-chart/values.yaml
                         sed -i "s|image: 497339096730.dkr.ecr.us-east-1.amazonaws.com/backend:.*|image: 497339096730.dkr.ecr.us-east-1.amazonaws.com/backend:${IMAGE_TAG}|" helm-chart/values.yaml
-
-                        echo "=== AFTER ==="
-                        cat helm-chart/values.yaml
-
-                        if git diff --quiet; then
-                            echo "No changes to commit. Skipping commit."
-                        else
-                            git add helm-chart/values.yaml
-                            git commit -m "Updated helm values.yaml to version ${IMAGE_TAG}"
-                            git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME}.git HEAD:main
-                        fi
+                    
+                        # ... git commit/push lines ...
                     """
                 }
             }
