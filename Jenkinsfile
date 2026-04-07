@@ -153,13 +153,22 @@ pipeline {
                 )]) {
                     sh """
                         set -e
-                        # ... git config lines ...
-                    
-                        # Use the specific account ID (497339096730) and replace the whole image line
+                        # 1. Update the image tag using double quotes to handle variables properly
                         sed -i "s|image: 497339096730.dkr.ecr.us-east-1.amazonaws.com/frontend:.*|image: 497339096730.dkr.ecr.us-east-1.amazonaws.com/frontend:${IMAGE_TAG}|" helm-chart/values.yaml
                         sed -i "s|image: 497339096730.dkr.ecr.us-east-1.amazonaws.com/backend:.*|image: 497339096730.dkr.ecr.us-east-1.amazonaws.com/backend:${IMAGE_TAG}|" helm-chart/values.yaml
                     
-                        # ... git commit/push lines ...
+                        # 2. VERIFY the change actually happened in the console
+                        echo "Verification: Checking if values.yaml updated to version ${IMAGE_TAG}"
+                        grep "image:" helm-chart/values.yaml
+                    
+                        # 3. PUSH the change back to GitHub
+                        git config user.email "jenkins@example.com"
+                        git config user.name "Jenkins Pipeline"
+                        git add helm-chart/values.yaml
+                        git commit -m "chore: update image tag to ${IMAGE_TAG} [skip ci]"
+                        
+                        # Use credentials to push (assuming you have a 'github-token' credential id)
+                        git push origin main
                     """
                 }
             }
